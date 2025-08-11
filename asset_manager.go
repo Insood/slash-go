@@ -1,81 +1,31 @@
 package main
 
 import (
-	"encoding/xml"
 	"fmt"
-	"io"
-	"os"
+	"io/fs"
+	"path/filepath"
 )
 
 type AssetManager struct {
 }
 
-type TileSetReference struct {
-	FirstGID int    `xml:"firstgid,attr"`
-	Source   string `xml:"source,attr"`
-}
+func LoadAssets() AssetManager {
+	err := filepath.WalkDir("assets", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
 
-type Layer struct {
-	ID     int    `xml:"id,attr"`
-	Name   string `xml:"name,attr"`
-	Width  int    `xml:"width,attr"`
-	Height int    `xml:"height,attr"`
-	Data   struct {
-		Encoding string `xml:"encoding,attr"`
-		Content  string `xml:",chardata"`
-	} `xml:"data"`
-}
+		if d.IsDir() {
+			return nil
+		}
 
-type GameMap struct {
-	// <map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="1">
-	Version           string             `xml:"version,attr"`
-	TiledVersion      string             `xml:"tiledversion,attr"`
-	Orientation       string             `xml:"orientation,attr"`
-	RenderOrder       string             `xml:"renderorder,attr"`
-	Width             int                `xml:"width,attr"`
-	Height            int                `xml:"height,attr"`
-	TileWidth         int                `xml:"tilewidth,attr"`
-	TileHeight        int                `xml:"tileheight,attr"`
-	Infinite          int                `xml:"infinite,attr"`
-	NextLayerID       int                `xml:"nextlayerid,attr"`
-	NextObjectID      int                `xml:"nextobjectid,attr"`
-	TileSetReferences []TileSetReference `xml:"tileset"`
-	Layers            []Layer            `xml:"layer"`
-}
-
-type TileSetDefinition struct {
-	Name         string `xml:"name,attr"`
-	Version      string `xml:"version,attr"`
-	TiledVersion string `xml:"tiledversion,attr"`
-	TileWidth    int    `xml:"tilewidth,attr"`
-	TileHeight   int    `xml:"tileheight,attr"`
-	TileCount    int    `xml:"tilecount,attr"`
-	Columns      int    `xml:"columns,attr"`
-	Image        struct {
-		ImagePath   string `xml:"source,attr"`
-		ImageWidth  int    `xml:"width,attr"`
-		ImageHeight int    `xml:"height,attr"`
-	} `xml:"image"`
-}
-
-func LoadXMLFromFile[XMLType any](path string) *XMLType {
-	xmlFile, err := os.Open(path)
+		fmt.Printf("Path: %s, IsDir: %t\n", path, d.IsDir())
+		return nil
+	})
 
 	if err != nil {
-		fmt.Println(err)
 		panic(err)
 	}
 
-	defer xmlFile.Close()
-	xmlStruct := new(XMLType)
-
-	byteValue, _ := io.ReadAll(xmlFile)
-
-	err = xml.Unmarshal(byteValue, &xmlStruct)
-	if err != nil {
-		fmt.Println(err)
-		panic(err)
-	}
-
-	return xmlStruct
+	return AssetManager{}
 }
