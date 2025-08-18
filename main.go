@@ -32,28 +32,28 @@ func main() {
 	// gameMap := LoadXMLFromFile[GameMapXML]("assets/maps/main.tmx")
 	// fmt.Println(gameMap)
 
-	// LoadAssets()
-
 	raylib.InitWindow(ScreenWidth, ScreenHeight, "Slash")
 	defer raylib.CloseWindow()
 
-	texture := raylib.LoadTexture("assets/tiles/walls.png")
+	// raylib.LoadTexture("assets/tiles/walls.png")
 
-	Game := Game{
-		Camera:      &raylib.Camera2D{},
-		Player:      raylib.Rectangle{X: -1, Y: -1, Width: 1, Height: 1},
-		PlayerColor: raylib.Red,
-		Texture:     &texture,
-	}
+	LoadAssets()
 
-	Game.Camera.Target = raylib.Vector2{X: 0, Y: 0}
-	Game.Camera.Offset = raylib.Vector2{X: ScreenWidth / 2, Y: ScreenHeight / 2}
-	Game.Camera.Rotation = 0
-	Game.Camera.Zoom = 128
+	// Game := Game{
+	// 	Camera:      &raylib.Camera2D{},
+	// 	Player:      raylib.Rectangle{X: -1, Y: -1, Width: 1, Height: 1},
+	// 	PlayerColor: raylib.Red,
+	// 	Texture:     &texture,
+	// }
 
-	raylib.SetTargetFPS(60)
+	// Game.Camera.Target = raylib.Vector2{X: 0, Y: 0}
+	// Game.Camera.Offset = raylib.Vector2{X: ScreenWidth / 2, Y: ScreenHeight / 2}
+	// Game.Camera.Rotation = 0
+	// Game.Camera.Zoom = 128
 
-	for !raylib.WindowShouldClose() {
-		DrawMainScreen(&Game)
-	}
+	// raylib.SetTargetFPS(60)
+
+	// for !raylib.WindowShouldClose() {
+	// 	DrawMainScreen(&Game)
+	// }
 }
