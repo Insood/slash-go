@@ -1,6 +1,16 @@
 ### Milestones
 - [X] Load Tiled maps (tmx) & tileset definitions
 - [X] Load a texture and allow for pan/zooming
-- [ ] Display a loaded map at (0,0)
-- [ ] Load all assets (images, maps, tilesets) into some sort of asset manager
-- [ ] Implement panning & zooming
+- [X] Display a loaded map at (0,0)
+- [X] Load all assets (images, maps, tilesets) into some sort of asset manager
+- [X] Implement panning & zooming
+- [ ] Load multiple maps side by side
+- [ ] Only render maps in view
+- [ ] Load collision layer from TMX file
+- [ ] Player movement animation
+- [ ] Player collisions
+- [ ] Player attack animation
+- [ ] Enemy loading (from TMX)
+- [ ] Basic enemy movement (random)
+- [ ] Basic combat (player attacks passive enemy)
+- [ ] Basic enemy AI (idle > charge > attack > retreat)

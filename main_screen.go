@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	raylib "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -9,7 +11,7 @@ const (
 )
 
 func DrawMainScreen(Game *Game) {
-	Game.Camera.Zoom += float32(raylib.GetMouseWheelMove()) * 2
+	Game.Camera.Zoom += float32(raylib.GetMouseWheelMove()) * ZoomSpeed
 
 	if Game.Camera.Zoom > 128 {
 		Game.Camera.Zoom = 128
@@ -48,19 +50,39 @@ func DrawMainScreen(Game *Game) {
 	raylib.DrawLine(0, AxisLength, 0, -AxisLength, raylib.LightGray)
 	raylib.DrawLine(AxisLength, 0, -AxisLength, 0, raylib.LightGray)
 
+	for _, tile_map := range Game.AssetManager.Tilemaps {
+		for layer_ix, layer := range tile_map.Layers {
+			// Only drawing the first layer for now
+			if layer_ix > 1 {
+				break
+			}
+			for row := range layer.Rows {
+				for col := range layer.Columns {
+
+					tile := layer.GetTile(col, row)
+
+					if tile.TileSetTile == nil {
+						continue
+					}
+
+					fmt.Println(row, col)
+					tex := tile.TileSetTile.TileSet.Texture
+
+					raylib.DrawTexturePro(
+						tex,
+						tile.TileSetTile.Rect,
+						raylib.Rectangle{X: float32(col), Y: float32(row), Width: 1, Height: 1},
+						raylib.Vector2{X: 0, Y: 0},
+						0,
+						raylib.White)
+				}
+			}
+		}
+	}
+
 	raylib.DrawRectangleRec(Game.Player, Game.PlayerColor)
-	raylib.DrawTexturePro(
-		*Game.Texture,
-		// raylib.Rectangle{X: 0, Y: 0, Width: float32(Game.Texture.Width), Height: float32(Game.Texture.Height)},
-		raylib.Rectangle{X: 16, Y: 16, Width: 16, Height: 16},
-		raylib.Rectangle{X: 0, Y: 0, Width: 1, Height: 1},
-		raylib.Vector2{X: 0, Y: 0},
-		0,
-		raylib.White)
 
 	raylib.EndMode2D()
-
-	// raylib.DrawTexture(*Game.Texture, 0, 0, raylib.White)
 
 	raylib.EndDrawing()
 }

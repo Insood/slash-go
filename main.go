@@ -7,8 +7,9 @@ import (
 const (
 	ScreenWidth     = 800
 	ScreenHeight    = 600
-	CameraPanSpeed  = 0.5
-	PlayerMoveSpeed = 0.01
+	CameraPanSpeed  = 5
+	PlayerMoveSpeed = 0.05
+	ZoomSpeed       = 4
 )
 
 var (
@@ -16,44 +17,31 @@ var (
 )
 
 type Game struct {
-	Camera      *raylib.Camera2D
-	Player      raylib.Rectangle
-	PlayerColor raylib.Color
-	Texture     *raylib.Texture2D
+	Camera       *raylib.Camera2D
+	Player       raylib.Rectangle
+	PlayerColor  raylib.Color
+	AssetManager *AssetManager
 }
 
 func main() {
-	// tileMap := LoadXMLFromFile[TileSetDefinitionXML]("assets/tilesets/floor.tsx")
-	// fmt.Println(tileMap)
-
-	// tileMap = LoadXMLFromFile[TileSetDefinitionXML]("assets/tilesets/walls.tsx")
-	// fmt.Println(tileMap)
-
-	// gameMap := LoadXMLFromFile[GameMapXML]("assets/maps/main.tmx")
-	// fmt.Println(gameMap)
-
 	raylib.InitWindow(ScreenWidth, ScreenHeight, "Slash")
 	defer raylib.CloseWindow()
 
-	// raylib.LoadTexture("assets/tiles/walls.png")
+	Game := Game{
+		Camera:       &raylib.Camera2D{},
+		Player:       raylib.Rectangle{X: -1, Y: -1, Width: 1, Height: 1},
+		PlayerColor:  raylib.Red,
+		AssetManager: LoadAssets(),
+	}
 
-	LoadAssets()
+	Game.Camera.Target = raylib.Vector2{X: 0, Y: 0}
+	Game.Camera.Offset = raylib.Vector2{X: ScreenWidth / 2, Y: ScreenHeight / 2}
+	Game.Camera.Rotation = 0
+	Game.Camera.Zoom = 128
 
-	// Game := Game{
-	// 	Camera:      &raylib.Camera2D{},
-	// 	Player:      raylib.Rectangle{X: -1, Y: -1, Width: 1, Height: 1},
-	// 	PlayerColor: raylib.Red,
-	// 	Texture:     &texture,
-	// }
+	raylib.SetTargetFPS(60)
 
-	// Game.Camera.Target = raylib.Vector2{X: 0, Y: 0}
-	// Game.Camera.Offset = raylib.Vector2{X: ScreenWidth / 2, Y: ScreenHeight / 2}
-	// Game.Camera.Rotation = 0
-	// Game.Camera.Zoom = 128
-
-	// raylib.SetTargetFPS(60)
-
-	// for !raylib.WindowShouldClose() {
-	// 	DrawMainScreen(&Game)
-	// }
+	for !raylib.WindowShouldClose() {
+		DrawMainScreen(&Game)
+	}
 }

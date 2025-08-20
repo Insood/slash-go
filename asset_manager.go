@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io/fs"
 	"path/filepath"
+	"strconv"
+	"strings"
 
 	raylib "github.com/gen2brain/raylib-go/raylib"
 )
@@ -17,18 +19,6 @@ func AbsolutePathFromRelative(referencing_file_path string, relative_path string
 	base := filepath.Dir(referencing_file_path)
 	abs := filepath.Join(base, relative_path)
 	return abs
-}
-
-type TileSetTile struct {
-	TileMapRect raylib.Rectangle
-}
-
-type TileSet struct {
-	Width   int
-	Height  int
-	Columns int
-	Tiles   []TileSetTile
-	Texture raylib.Texture2D
 }
 
 func LoadTilesetFromXML(TileSetDefinitionXML *TileSetDefinitionXML) *TileSet {
@@ -48,7 +38,7 @@ func LoadTilesetFromXML(TileSetDefinitionXML *TileSetDefinitionXML) *TileSet {
 				Width:  float32(tile_width),
 				Height: float32(tile_height),
 			}
-			tile_set.Tiles = append(tile_set.Tiles, TileSetTile{TileMapRect: rect})
+			tile_set.Tiles = append(tile_set.Tiles, TileSetTile{Rect: rect, TileSet: &tile_set})
 		}
 	}
 
@@ -58,6 +48,7 @@ func LoadTilesetFromXML(TileSetDefinitionXML *TileSetDefinitionXML) *TileSet {
 type AssetManager struct {
 	Textures map[string]raylib.Texture2D
 	Tilesets map[string]TileSet
+	Tilemaps map[string]TileMap
 }
 
 func (asset_manager *AssetManager) LoadTexture(path string) raylib.Texture2D {
@@ -79,11 +70,81 @@ func (asset_manager *AssetManager) LoadTileset(tileset_path string) {
 	asset_manager.Tilesets[tileset_path] = *tile_set
 }
 
-func (asset_manager *AssetManager) LoadTilemap(tilemap_path string) {
+func (asset_manager *AssetManager) GetTileSetTile(tile_map_path string, tile_map_xml *TileMapXML, tile_id int) *TileSetTile {
+	// TileSetReferences are in a array with ascending FirstGID values. If each TileSetReference is for
+	// an 8x8 tileset (64 tiles), then the FirstGIDs are [1, 65, 129, ...]
 
+	tile_set_tile := &TileSetTile{}
+	for _, tile_set_reference := range tile_map_xml.TileSetReferences {
+		relative_path := tile_set_reference.Source
+		tile_set_path := AbsolutePathFromRelative(tile_map_path, relative_path)
+		tile_set := asset_manager.Tilesets[tile_set_path]
+		if tile_id < tile_set_reference.FirstGID+len(tile_set.Tiles) {
+			tile_set_tile = &tile_set.Tiles[tile_id-tile_set_reference.FirstGID]
+			break
+		}
+	}
+
+	if tile_set_tile == nil {
+		panic(fmt.Errorf("could not find tileset tile for tile ID %d", tile_id))
+	}
+	return tile_set_tile
 }
 
-func LoadAssets() AssetManager {
+func (asset_manager *AssetManager) LoadTilemap(tile_map_path string) {
+	tile_map_xml := LoadXMLFromFile[TileMapXML](tile_map_path)
+
+	tile_map := TileMap{
+		Columns: tile_map_xml.Width,
+		Rows:    tile_map_xml.Height,
+		Layers:  make([]DrawingLayer, len(tile_map_xml.Layers)),
+	}
+
+	for i, layer := range tile_map_xml.Layers {
+		drawing_layer := DrawingLayer{
+			Columns: layer.Width,
+			Rows:    layer.Height,
+			Tiles:   make([]GameTile, layer.Width*layer.Height),
+		}
+		tile_map.Layers[i] = drawing_layer
+		tile_data := strings.TrimSpace(layer.Data.Content)
+		tile_data = strings.ReplaceAll(tile_data, "\r\n", "\n")
+
+		for row, row_string := range strings.Split(tile_data, "\n") {
+			for column, tile_string := range strings.Split(row_string, ",") {
+				tile_string = strings.TrimSpace(tile_string)
+
+				// Otherside of the last comma in the line
+				if tile_string == "" {
+					continue
+				}
+
+				tile_id, err := strconv.Atoi(tile_string)
+				if err != nil {
+					panic(err)
+				}
+
+				var tile_set_tile *TileSetTile
+				if tile_id != 0 {
+					tile_set_tile = asset_manager.GetTileSetTile(tile_map_path, tile_map_xml, tile_id)
+				}
+
+				game_tile := GameTile{
+					Row:         row,
+					Column:      column,
+					Rect:        raylib.Rectangle{X: float32(column), Y: float32(row), Width: 1, Height: 1},
+					TileSetTile: tile_set_tile,
+				}
+
+				tile_map.Layers[i].SetTile(column, row, &game_tile)
+			}
+		}
+	}
+
+	asset_manager.Tilemaps[tile_map_path] = tile_map
+}
+
+func LoadAssets() *AssetManager {
 	paths := make(map[string][]string)
 
 	err := filepath.WalkDir("assets", func(path string, d fs.DirEntry, err error) error {
@@ -107,8 +168,6 @@ func LoadAssets() AssetManager {
 		return nil
 	})
 
-	fmt.Println(paths)
-
 	if err != nil {
 		panic(err)
 	}
@@ -116,6 +175,7 @@ func LoadAssets() AssetManager {
 	asset_manager := AssetManager{
 		Textures: make(map[string]raylib.Texture2D),
 		Tilesets: make(map[string]TileSet),
+		Tilemaps: make(map[string]TileMap),
 	}
 
 	for _, path := range paths["textures"] {
@@ -130,5 +190,5 @@ func LoadAssets() AssetManager {
 		asset_manager.LoadTilemap(path)
 	}
 
-	return asset_manager
+	return &asset_manager
 }

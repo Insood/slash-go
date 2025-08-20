@@ -1,6 +1,6 @@
 module github.com/Insood/slash-go
 
-go 1.22.2
+go 1.24.6
 
 require github.com/gen2brain/raylib-go/raylib v0.55.1
 

@@ -23,7 +23,7 @@ type LayerXML struct {
 	} `xml:"data"`
 }
 
-type GameMapXML struct {
+type TileMapXML struct {
 	// <map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="1">
 	Version           string                `xml:"version,attr"`
 	TiledVersion      string                `xml:"tiledversion,attr"`
