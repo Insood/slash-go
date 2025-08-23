@@ -12,6 +12,8 @@ type GameTile struct {
 type TileMap struct {
 	Columns int
 	Rows    int
+	OffsetX int
+	OffsetY int
 	Layers  []DrawingLayer
 }
 

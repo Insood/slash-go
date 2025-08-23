@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 )
 
 type TileSetReferenceXML struct {
@@ -23,6 +24,11 @@ type LayerXML struct {
 	} `xml:"data"`
 }
 
+type Property struct {
+	Name  string `xml:"name,attr"`
+	Value string `xml:"value,attr"`
+}
+
 type TileMapXML struct {
 	// <map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="1">
 	Version           string                `xml:"version,attr"`
@@ -37,7 +43,23 @@ type TileMapXML struct {
 	NextLayerID       int                   `xml:"nextlayerid,attr"`
 	NextObjectID      int                   `xml:"nextobjectid,attr"`
 	TileSetReferences []TileSetReferenceXML `xml:"tileset"`
+	Properties        []Property            `xml:"properties>property"`
 	Layers            []LayerXML            `xml:"layer"`
+}
+
+func (tile_map_xml *TileMapXML) GetPropertyValue(name string) string {
+	for _, property := range tile_map_xml.Properties {
+		if property.Name == name {
+			return property.Value
+		}
+	}
+	return ""
+}
+
+func (tile_map_xml *TileMapXML) GetPropertyValueAsInt(name string) (int, error) {
+	raw_value := tile_map_xml.GetPropertyValue(name)
+	value, err := strconv.Atoi(raw_value)
+	return value, err
 }
 
 type TileSetDefinitionXML struct {

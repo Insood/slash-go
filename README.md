@@ -4,7 +4,7 @@
 - [X] Display a loaded map at (0,0)
 - [X] Load all assets (images, maps, tilesets) into some sort of asset manager
 - [X] Implement panning & zooming
-- [ ] Load multiple maps side by side
+- [X] Load multiple maps side by side
 - [ ] Only render maps in view
 - [ ] Load collision layer from TMX file
 - [ ] Player movement animation

@@ -94,11 +94,21 @@ func (asset_manager *AssetManager) GetTileSetTile(tile_map_path string, tile_map
 func (asset_manager *AssetManager) LoadTilemap(tile_map_path string) {
 	tile_map_xml := LoadXMLFromFile[TileMapXML](tile_map_path)
 
+	offset_x, err_x := tile_map_xml.GetPropertyValueAsInt("offset_x")
+	offset_y, err_y := tile_map_xml.GetPropertyValueAsInt("offset_y")
+	if (err_x != nil) || (err_y != nil) {
+		panic("offset_x and offset_y must be present and be integers")
+	}
+
 	tile_map := TileMap{
 		Columns: tile_map_xml.Width,
 		Rows:    tile_map_xml.Height,
+		OffsetX: offset_x,
+		OffsetY: offset_y,
 		Layers:  make([]DrawingLayer, len(tile_map_xml.Layers)),
 	}
+
+	fmt.Println(tile_map_xml.Properties)
 
 	for i, layer := range tile_map_xml.Layers {
 		drawing_layer := DrawingLayer{
