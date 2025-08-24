@@ -30,6 +30,19 @@ func LoadTilesetFromXML(TileSetDefinitionXML *TileSetDefinitionXML) *TileSet {
 	columns := TileSetDefinitionXML.Image.ImageWidth / TileSetDefinitionXML.TileWidth
 	rows := TileSetDefinitionXML.Image.ImageHeight / TileSetDefinitionXML.TileHeight
 
+	tile_collisions := map[int]raylib.Rectangle{}
+	for _, tile := range TileSetDefinitionXML.Tiles {
+		if len(tile.Objects) == 1 {
+			tile_collisions[tile.Id] = raylib.Rectangle{
+				X:      tile.Objects[0].X / float32(tile_width),
+				Y:      tile.Objects[0].Y / float32(tile_height),
+				Width:  tile.Objects[0].Width / float32(tile_width),
+				Height: tile.Objects[0].Height / float32(tile_height),
+			}
+		}
+	}
+
+	tile_id := 0
 	for row := range rows {
 		for column := range columns {
 			rect := raylib.Rectangle{
@@ -38,7 +51,17 @@ func LoadTilesetFromXML(TileSetDefinitionXML *TileSetDefinitionXML) *TileSet {
 				Width:  float32(tile_width),
 				Height: float32(tile_height),
 			}
-			tile_set.Tiles = append(tile_set.Tiles, TileSetTile{Rect: rect, TileSet: &tile_set})
+			collision := tile_collisions[tile_id]
+			tile_set.Tiles = append(
+				tile_set.Tiles,
+				TileSetTile{
+					Rect:          rect,
+					TileSet:       &tile_set,
+					CollisionRect: collision,
+				},
+			)
+
+			tile_id += 1
 		}
 	}
 
@@ -107,8 +130,6 @@ func (asset_manager *AssetManager) LoadTilemap(tile_map_path string) {
 		OffsetY: offset_y,
 		Layers:  make([]DrawingLayer, len(tile_map_xml.Layers)),
 	}
-
-	fmt.Println(tile_map_xml.Properties)
 
 	for i, layer := range tile_map_xml.Layers {
 		drawing_layer := DrawingLayer{

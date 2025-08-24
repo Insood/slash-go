@@ -6,9 +6,10 @@
 - [X] Implement panning & zooming
 - [X] Load multiple maps side by side
 - [ ] Only render maps in view
-- [ ] Load collision layer from TMX file
+- [X] Load collision layer from TMX file
 - [ ] Player movement animation
 - [ ] Player collisions
+- [ ] Basic client/server (anyone can connect, broadcast position)
 - [ ] Player attack animation
 - [ ] Enemy loading (from TMX)
 - [ ] Basic enemy movement (random)

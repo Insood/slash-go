@@ -39,6 +39,48 @@ func DrawLayers(asset_manager *AssetManager) {
 	}
 }
 
+func DrawTileMapOutline(asset_manager *AssetManager) {
+	for _, tile_map := range asset_manager.Tilemaps {
+		raylib.DrawRectangleLinesEx(
+			raylib.Rectangle{
+				X:      float32(tile_map.OffsetX),
+				Y:      float32(tile_map.OffsetY),
+				Width:  float32(tile_map.Columns),
+				Height: float32(tile_map.Rows),
+			},
+			1.0/16,
+			raylib.Green)
+	}
+}
+
+func DrawCollisions(asset_manager *AssetManager) {
+	for _, tile_map := range asset_manager.Tilemaps {
+		for _, layer := range tile_map.Layers {
+			for row := range layer.Rows {
+				for col := range layer.Columns {
+					tile := layer.GetTile(col, row)
+					if tile.TileSetTile == nil {
+						continue
+					}
+
+					collision_rect := tile.TileSetTile.CollisionRect
+
+					if collision_rect.Width > 0 && collision_rect.Height > 0 {
+						rect := raylib.Rectangle{
+							X:      float32(col+tile_map.OffsetX) + collision_rect.X,
+							Y:      float32(row+tile_map.OffsetY) + collision_rect.Y,
+							Width:  collision_rect.Width,
+							Height: collision_rect.Height,
+						}
+
+						raylib.DrawRectangleLinesEx(rect, 1.0/16, raylib.Red)
+					}
+				}
+			}
+		}
+	}
+}
+
 func DrawMainScreen(Game *Game) {
 	Game.Camera.Zoom += float32(raylib.GetMouseWheelMove()) * ZoomSpeed
 
@@ -80,6 +122,8 @@ func DrawMainScreen(Game *Game) {
 	raylib.DrawLine(AxisLength, 0, -AxisLength, 0, raylib.LightGray)
 
 	DrawLayers(Game.AssetManager)
+	DrawCollisions(Game.AssetManager)
+	DrawTileMapOutline(Game.AssetManager)
 
 	raylib.DrawRectangleRec(Game.Player, Game.PlayerColor)
 

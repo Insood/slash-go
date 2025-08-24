@@ -17,10 +17,11 @@ var (
 )
 
 type Game struct {
-	Camera       *raylib.Camera2D
-	Player       raylib.Rectangle
-	PlayerColor  raylib.Color
-	AssetManager *AssetManager
+	Camera        *raylib.Camera2D
+	Player        raylib.Rectangle
+	PlayerColor   raylib.Color
+	AssetManager  *AssetManager
+	ShowCollision bool
 }
 
 func main() {
@@ -28,10 +29,11 @@ func main() {
 	defer raylib.CloseWindow()
 
 	Game := Game{
-		Camera:       &raylib.Camera2D{},
-		Player:       raylib.Rectangle{X: -1, Y: -1, Width: 1, Height: 1},
-		PlayerColor:  raylib.Red,
-		AssetManager: LoadAssets(),
+		Camera:        &raylib.Camera2D{},
+		Player:        raylib.Rectangle{X: -1, Y: -1, Width: 1, Height: 1},
+		PlayerColor:   raylib.Red,
+		AssetManager:  LoadAssets(),
+		ShowCollision: true,
 	}
 
 	Game.Camera.Target = raylib.Vector2{X: 0, Y: 0}

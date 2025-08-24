@@ -32,8 +32,9 @@ func (drawing_layer *DrawingLayer) SetTile(column int, row int, tile *GameTile) 
 }
 
 type TileSetTile struct {
-	Rect    raylib.Rectangle
-	TileSet *TileSet
+	Rect          raylib.Rectangle
+	TileSet       *TileSet
+	CollisionRect raylib.Rectangle
 }
 
 type TileSet struct {

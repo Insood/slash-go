@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/xml"
-	"fmt"
 	"io"
+	"log"
 	"os"
 	"strconv"
 )
@@ -62,6 +62,18 @@ func (tile_map_xml *TileMapXML) GetPropertyValueAsInt(name string) (int, error) 
 	return value, err
 }
 
+type TileSetDefinitionTileObject struct {
+	X      float32 `xml:"x,attr"`
+	Y      float32 `xml:"y,attr"`
+	Width  float32 `xml:"width,attr"`
+	Height float32 `xml:"height,attr"`
+}
+
+type TileSetDefinitionTileXML struct {
+	Id      int                           `xml:"id,attr"`
+	Objects []TileSetDefinitionTileObject `xml:"objectgroup>object"`
+}
+
 type TileSetDefinitionXML struct {
 	Name         string `xml:"name,attr"`
 	Version      string `xml:"version,attr"`
@@ -75,13 +87,14 @@ type TileSetDefinitionXML struct {
 		ImageWidth  int    `xml:"width,attr"`
 		ImageHeight int    `xml:"height,attr"`
 	} `xml:"image"`
+	Tiles []TileSetDefinitionTileXML `xml:"tile"`
 }
 
 func LoadXMLFromFile[XMLType any](path string) *XMLType {
 	xmlFile, err := os.Open(path)
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		panic(err)
 	}
 
@@ -92,7 +105,7 @@ func LoadXMLFromFile[XMLType any](path string) *XMLType {
 
 	err = xml.Unmarshal(byteValue, &xmlStruct)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		panic(err)
 	}
 

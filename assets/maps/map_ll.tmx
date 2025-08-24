@@ -6,7 +6,7 @@
  </properties>
  <tileset firstgid="1" source="../tilesets/walls.tsx"/>
  <tileset firstgid="118" source="../tilesets/floor.tsx"/>
- <layer id="1" name="background" width="16" height="16" visible="0">
+ <layer id="1" name="background" width="16" height="16">
   <data encoding="csv">
 1,2,5,2,5,4,2,2,6,2,4,5,2,5,4,8,
 19,11,75,11,14,13,16,14,14,16,13,16,11,14,13,17,
