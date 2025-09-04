@@ -102,21 +102,11 @@ func DrawMainScreen(Game *Game) {
 		Game.Camera.Offset.Y += CameraPanSpeed
 	}
 
-	if raylib.IsKeyDown(raylib.KeyA) {
-		Game.Player.X -= PlayerMoveSpeed
-	} else if raylib.IsKeyDown(raylib.KeyD) {
-		Game.Player.X += PlayerMoveSpeed
-	}
-
-	if raylib.IsKeyDown(raylib.KeyW) {
-		Game.Player.Y -= PlayerMoveSpeed
-	} else if raylib.IsKeyDown(raylib.KeyS) {
-		Game.Player.Y += PlayerMoveSpeed
-	}
-
 	raylib.BeginDrawing()
 	raylib.ClearBackground(raylib.Black)
 	raylib.BeginMode2D(*Game.Camera)
+
+	Game.Engine.Update(1.0 / 60.0)
 
 	raylib.DrawLine(0, AxisLength, 0, -AxisLength, raylib.LightGray)
 	raylib.DrawLine(AxisLength, 0, -AxisLength, 0, raylib.LightGray)
@@ -124,8 +114,6 @@ func DrawMainScreen(Game *Game) {
 	DrawLayers(Game.AssetManager)
 	DrawCollisions(Game.AssetManager)
 	DrawTileMapOutline(Game.AssetManager)
-
-	raylib.DrawRectangleRec(Game.Player, Game.PlayerColor)
 
 	raylib.EndMode2D()
 

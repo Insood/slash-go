@@ -8,7 +8,7 @@ const (
 	ScreenWidth     = 800
 	ScreenHeight    = 600
 	CameraPanSpeed  = 5
-	PlayerMoveSpeed = 0.05
+	PlayerMoveSpeed = 5
 	ZoomSpeed       = 4
 )
 
@@ -18,10 +18,9 @@ var (
 
 type Game struct {
 	Camera        *raylib.Camera2D
-	Player        raylib.Rectangle
-	PlayerColor   raylib.Color
 	AssetManager  *AssetManager
 	ShowCollision bool
+	Engine        *Engine
 }
 
 func main() {
@@ -30,10 +29,9 @@ func main() {
 
 	Game := Game{
 		Camera:        &raylib.Camera2D{},
-		Player:        raylib.Rectangle{X: -1, Y: -1, Width: 1, Height: 1},
-		PlayerColor:   raylib.Red,
 		AssetManager:  LoadAssets(),
 		ShowCollision: true,
+		Engine:        NewEngine(),
 	}
 
 	Game.Camera.Target = raylib.Vector2{X: 0, Y: 0}
